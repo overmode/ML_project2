@@ -28,9 +28,19 @@ def main():
 		print("epoch {}".format(epoch))
 		for ix, jy, n in zip(cooc.row, cooc.col, cooc.data):
 
-			# fill in your SGD code here, 
-			# for the update resulting from co-occurence (i,j)
-		
+            f = ((n / nmax)**alpha) if n < nmax else 1
+            inter_cost = (xs[ix]@(ys[iy]) - log(n))
+
+            # We compute the gradients for both context and main vector words
+            grad_main = f * inter_cost * ys[iy]
+            grad_context = f * inter_cost * xs[ix]
+
+            # Update the vector words
+            xs[ix] = xs[ix] - (eta * grad_main)
+            ys[iy] = ys[iy] - (eta * grad_context)
+
+
+
 
     np.save('embeddings', xs)
 
