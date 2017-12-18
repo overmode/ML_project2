@@ -179,7 +179,7 @@ def extract_tokens(tknzr, tweet_string):
 
     return generator(unigrams)
 
-def build_vocab_counter(tweets, cut_threshold):
+def build_vocab_counter(tweets, cut_threshold, bitri):
     startTime= datetime.now()
     tknzr = TweetTokenizer(preserve_case=False)
 
@@ -189,7 +189,10 @@ def build_vocab_counter(tweets, cut_threshold):
     for tweet in tweets:
 
         # add all tokens of a tweet in the counter
-        final_counter.update(extract_tokens(tknzr, tweet))
+        if(bitri):
+            final_counter.update(extract_tokens(tknzr, tweet))
+        else :
+            final_counter.update(tweet.split(" "))
         if loading_counter%1000==1:
                 print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
         loading_counter+=1
@@ -197,11 +200,14 @@ def build_vocab_counter(tweets, cut_threshold):
     # remove less frequent items
     print("removing items present less than", cut_threshold, "times")
     final_set = Counter(token for token in final_counter.elements() if final_counter[token] >= cut_threshold)
-    
-    timeElapsed=datetime.now()-startTime 
+    for k in list(final_counter):
+        if final_counter[k] < cut_threshold:
+            del final_counter[k]
+
+    timeElapsed=datetime.now()-startTime
 
     print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))
-    
+
     return final_counter
 
 
@@ -227,3 +233,18 @@ def create_bitri_tweets(previous_name, dest, is_test_data):
     export(tweets, dest)
     timeElapsed=datetime.now()-startTime
     print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))
+
+#return true iff at least one of the tweets contains at least one of the words
+#tweets is an array of strings
+#words is a list of words
+def contains(tweets, words):
+    for t in tweets:
+        for w1 in t.split():
+            for w2 in words:
+                if w1 == w2:
+                    return True
+    return False
+
+def drop_duplicates(tweets):
+    tweets = list(set(tweets))
+    return tweets

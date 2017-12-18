@@ -10,8 +10,12 @@ def build_df(filepath):
     take the path of the file of the tweets
     """
 
-    df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8", quoting=csv.QUOTE_NONE,  header=None, names=["word"])
-    df["occurence"] = df["word"].map(lambda x:  int(x.split()[0]))
+
+    df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8",  header=None, names=["word"])
+    df["len"] = df["word"].map(lambda x : len(x.split()))
+    df = df[df["len"]==2]
+    df.drop(labels=["len"], axis = 1)
+    df["occurence"] = df["word"].map(lambda x:  x.split()[0])
     df["word"] = df["word"].map(lambda x:  x.split()[1])
     return df
 
@@ -30,7 +34,7 @@ def export(tweets, name):
         f.write("\n".join(tweets))
 
 def write_vocab_to_file(vocab_counter, dest_file_name):
-    with open(dest_file_name, "w") as inputfile:
+    with open(dest_file_name, "w", encoding="utf-8") as inputfile:
         for token, count in vocab_counter.most_common():
             inputfile.write(str(count))
             inputfile.write(" ")
