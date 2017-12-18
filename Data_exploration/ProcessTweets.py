@@ -1,5 +1,9 @@
 import pandas as pd
+from datetime import datetime
+from collections import Counter
 from nltk.stem import PorterStemmer
+from nltk import bigrams, trigrams
+from nltk.tokenize import TweetTokenizer
 
 def merging(neg, pos, only_words = False):
 
@@ -164,8 +168,20 @@ def stem_tweets(tweets, semantic):
 def token_to_string(token):
     return (str(token)).replace(" ", "")
 
+def extract_tokens(tknzr, tweet_string):
+
+    unigrams = [token for token in tknzr.tokenize(tweet_string)]
+
+    def generator(unigrams):
+        yield from unigrams
+        yield from bigrams(unigrams)
+        yield from trigrams(unigrams)
+
+    return generator(unigrams)
+
 def build_vocab_counter(tweets, cut_threshold):
     startTime= datetime.now()
+    tknzr = TweetTokenizer(preserve_case=False)
 
     # add every stemmed tokens, bigrams and trigrams
     final_counter = Counter()
@@ -173,7 +189,7 @@ def build_vocab_counter(tweets, cut_threshold):
     for tweet in tweets:
 
         # add all tokens of a tweet in the counter
-        final_counter.update(extract_tokens(tweet))
+        final_counter.update(extract_tokens(tknzr, tweet))
         if loading_counter%1000==1:
                 print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
         loading_counter+=1
