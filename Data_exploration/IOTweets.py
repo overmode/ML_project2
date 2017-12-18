@@ -14,7 +14,7 @@ def build_df(filepath):
     df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8",  header=None, names=["word"])
     df["len"] = df["word"].map(lambda x : len(x.split()))
     df = df[df["len"]==2]
-    df.drop(labels=["len"], axis = 1)
+    df = df.drop(labels=["len"], axis = 1)
     df["occurence"] = df["word"].map(lambda x:  x.split()[0])
     df["word"] = df["word"].map(lambda x:  x.split()[1])
     return df
