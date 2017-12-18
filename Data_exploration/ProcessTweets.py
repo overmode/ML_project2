@@ -111,7 +111,7 @@ def find_repetition(tweet):
             i+=1
     return copy
 
-
+''' already done by nltk's stem
 def no_s(tweet):
     tweet = tweet.split()
     for i, t in enumerate(tweet):
@@ -127,7 +127,7 @@ def no_s(tweet):
 
     tweet = " ".join(tweet)
     return tweet
-
+'''
 
 
 
@@ -146,7 +146,7 @@ def standardize_tweets(tweets):
     for i, tweet in enumerate(tweets):
         tweet = find_repetition(tweet)
         tweet = no_dot(tweet)
-        tweets[i] = no_s(tweet)
+        #tweets[i] = no_s(tweet)
 
     return tweets
 
@@ -163,6 +163,31 @@ def stem_tweets(tweets, semantic):
 
 def token_to_string(token):
     return (str(token)).replace(" ", "")
+
+def build_vocab_counter(tweets, cut_threshold):
+    startTime= datetime.now()
+
+    # add every stemmed tokens, bigrams and trigrams
+    final_counter = Counter()
+    loading_counter = 0
+    for tweet in tweets:
+
+        # add all tokens of a tweet in the counter
+        final_counter.update(extract_tokens(tweet))
+        if loading_counter%1000==1:
+                print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
+        loading_counter+=1
+
+    # remove less frequent items
+    print("removing items present less than", cut_threshold, "times")
+    final_set = Counter(token for token in final_counter.elements() if final_counter[token] >= cut_threshold)
+    
+    timeElapsed=datetime.now()-startTime 
+
+    print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))
+    
+    return final_counter
+
 
 def add_bitri(tweets):
     "append bigrams and trigrams to the tweets "

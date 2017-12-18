@@ -19,7 +19,7 @@ def import_(path):
         tweets = [line.strip() for line in f]
     return tweets
 
-def import_without_comma(path):
+def import_without_id(path):
     with open(path, 'r', encoding="utf-8") as f:
         tweets = [line.strip()[line.find(",")+1:] for line in f]     # Make sure to withdraw the "nbr",
     return tweets
@@ -28,30 +28,10 @@ def export(tweets, name):
     with open(name, 'w', encoding="utf-8") as f:
         f.write("\n".join(tweets))
 
-
-def build_vocab(tweets, dest_file_name, cut):
-
-    # add stemmed tokens, bigrams and trigrams
-    final_set = Counter()
-    startTime= datetime.now()
-    len_tweets = len(tweets)
-    counter = 0
-    for tweet in tweets:
-        # add all tokens of a tweet in the counter
-        final_set.update(tweet)
-        if counter%1000==1:
-            print("{:.1f}".format(counter/len_tweets*100), "%", end='\r')
-        counter+=1
-
-    # remove less frequent items
-    print("removing items present less than", cut, "times")
-    final_set = Counter(token for token in final_set.elements() if final_set[token] >= cut)
-
+def write_vocab_to_file(vocab_counter, dest_file_name):
     with open(dest_file_name, "w") as inputfile:
-        for token, count in final_set.most_common():
+        for token, count in vocab_counter.most_common():
             inputfile.write(str(count))
             inputfile.write(" ")
             inputfile.write(str(token))
             inputfile.write("\n")
-    timeElapsed = datetime.now() - startTime
-    print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))
