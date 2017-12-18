@@ -33,5 +33,8 @@ def write_vocab_to_file(vocab_counter, dest_file_name):
         for token, count in vocab_counter.most_common():
             inputfile.write(str(count))
             inputfile.write(" ")
-            inputfile.write(str(token))
+            if type(token) is tuple:
+                inputfile.write(" ".join(token))
+            else:
+                inputfile.write(str(token))
             inputfile.write("\n")
