@@ -2,6 +2,7 @@ import pandas as pd
 from collections import Counter
 from datetime import datetime
 from ProcessTweets import *
+import csv
 
 def build_df(filepath):
     """from a cut_vocab return a dataframe which is a mapping of words in tweets
@@ -9,7 +10,7 @@ def build_df(filepath):
     take the path of the file of the tweets
     """
 
-    df = pd.read_table(filepath_or_buffer = filepath, header=None, names=["word"])
+    df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8", quoting=csv.QUOTE_NONE,  header=None, names=["word"])
     df["occurence"] = df["word"].map(lambda x:  int(x.split()[0]))
     df["word"] = df["word"].map(lambda x:  x.split()[1])
     return df
