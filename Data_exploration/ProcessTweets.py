@@ -293,7 +293,7 @@ def sem_by_repr2(semantics, tweet):
     return tweet
 
 #----------------------------no_dot(tweet)------------------------------------
-#replace dots (but not "...") by a blank space in a tweet
+#replace dots (but not "...") by a space in a tweet
 #tweet : the tweet in which dots should be replaced
 
 
