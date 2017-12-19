@@ -1,20 +1,19 @@
 import numpy as np
 import pickle
+from extract_tokens import *
 
 
-def construct_features(tweets_filename, embeddings, weights):
+def construct_features(tweets, embeddings, weights):
     features = []
     invalid_features = [];
-    nb_dim = 20
+    nb_dim = 50
     pertinence = 35
 
     with open('vocab_full.pkl', 'rb') as f :
         vocab = pickle.load(f)
 
-    print(len(weights))
     #Load words from tweet set
     xs = np.load(embeddings)
-    tweets = np.array(open(file=tweets_filename, mode='r').readlines())
 
     for indl, line in enumerate(tweets):
         #we differentiate tweets containing pertinent words, those in dictionnary 'weights'
@@ -24,10 +23,10 @@ def construct_features(tweets_filename, embeddings, weights):
         count_pertinent = 0
         count_other = 0
 
-        for word in line.split():
-            local_w = vocab.get(word, -1)
+        for token in extract_tokens(line):
+            local_w = vocab.get(token, -1)
             if local_w != -1:
-                weight = weights.get(word, -1)
+                weight = weights.get(token, -1)
                 if weight != -1:
 
                     #If the word is pertinent, we add its word representation to others pertinents word's representation
