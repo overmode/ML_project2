@@ -420,11 +420,8 @@ def build_vocab_counter(tweets, cut_threshold, bitri):
 
     # remove less frequent items
     print("removing items present less than", cut_threshold, "times")
-    final_set = Counter(token for token in final_counter.elements() if final_counter[token] >= cut_threshold)
-    for k in list(final_counter):
-        if final_counter[k] < cut_threshold:
-            del final_counter[k]
-
+    final_counter = Counter(token for token in final_counter.elements() if final_counter[token] >= cut_threshold)
+    
     timeElapsed=datetime.now()-startTime
 
     print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))

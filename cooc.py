@@ -2,6 +2,7 @@
 from scipy.sparse import *
 import numpy as np
 import pickle
+from nltk import bigrams, trigrams
 
 
 def main():
@@ -11,13 +12,20 @@ def main():
 
     data, row, col = [], [], []
     counter = 1
-    for fn in ['train_pos_full.txt', 'train_neg_full.txt']:
+    for fn in ['preprocessed_pos', 'preprocessed_neg']:
         with open(fn) as f:
             for line in f:
-                tokens = [vocab.get(t, -1) for t in line.strip().split()]
-                tokens = [t for t in tokens if t >= 0]
-                for t in tokens:
-                    for t2 in tokens:
+                tokens = line.strip().split()
+                
+                def generator(unigrams):
+                    yield from unigrams
+                    yield from bigrams(unigrams)
+                    yield from trigrams(unigrams)
+               
+                tokens_ids = [vocab.get(t, -1) for t in generator(tokens)]
+                tokens_ids = [t for t in tokens_ids if t >= 0]
+                for t in tokens_ids:
+                    for t2 in tokens_ids:
                         data.append(1)
                         row.append(t)
                         col.append(t2)

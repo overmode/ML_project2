@@ -4,9 +4,14 @@ import pickle
 
 def main():
     vocab = dict()
-    with open('vocab_cut_full.txt') as f:
+    with open('preprocessed_vocab_pos') as f:
         for idx, line in enumerate(f):
-            vocab[line.strip()] = idx
+            token = line.strip().split()[1:]
+            if len(token) == 1:
+                token = token[0]
+            else:
+                token = tuple(token)
+            vocab[token] = idx
 
     with open('vocab_full.pkl', 'wb') as f:
         pickle.dump(vocab, f, pickle.HIGHEST_PROTOCOL)

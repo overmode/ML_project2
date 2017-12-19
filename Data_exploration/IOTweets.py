@@ -22,6 +22,9 @@ def build_df(filepath):
     #build the dataframe
     df["occurence"] = df["word"].map(lambda x:  x.split()[0])
     df["word"] = df["word"].map(lambda x:  x.split()[1])
+    
+    #handling of n-grams
+    #df["word"] = df["word"].map(lambda x:  tuple(x.split()[1:]))
     return df
 
 #----------------------------import_(path)------------------------------------
