@@ -4,6 +4,7 @@ from collections import Counter
 from nltk.stem import PorterStemmer
 from nltk import bigrams, trigrams
 from nltk.tokenize import TweetTokenizer
+from IOTweets import *
 
 #----------------------------merging(neg, pos, only_words = False)------------------------------------
 #This function merges the dataframes associated to positive and negative words.
@@ -86,7 +87,7 @@ def create_relevant_vocab(pertinence_thres, min_count, dataframe):
 #stem the words in tweets and save the updated tweets in a fallen
 #is_full : True iff we load the full version of tweets
 #cut_threshold : the minimum number of total occurences that words in the vocab of stemmed tweets should have
-
+'''
 def stemming(is_full, cut_threshold):
 
     print("Import Data")
@@ -186,7 +187,7 @@ def stemming(is_full, cut_threshold):
         write_vocab_to_file(vocab_pos, "cleaned_vocab_pos")
         write_vocab_to_file(vocab_neg, "cleaned_vocab_neg")
         write_vocab_to_file(vocab_test, "cleaned_vocab_test")
-
+'''
 
 #----------------------------process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold)------------------------------------
 #remove dots and repetitions in tweets, export the preprocessed tweets and their associated vocabs
@@ -205,7 +206,7 @@ def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
     tweets_pos =  import_(path_pos)
     tweets_neg =  import_(path_neg)
 
-    #remove duplicates
+    #remove duplicates from training data
     tweets_pos = drop_duplicates(tweets_pos)
     tweets_neg = drop_duplicates(tweets_neg)
 
@@ -219,11 +220,11 @@ def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
 
     #build the counters
     print("build vocab data pos")
-    vocab_pos = build_vocab_counter(preprocessed_pos, cut_threshold, False)
+    vocab_pos = build_vocab_counter(preprocessed_pos, cut_threshold, True)
     print("build vocab data neg")
-    vocab_neg = build_vocab_counter(preprocessed_neg, cut_threshold, False)
+    vocab_neg = build_vocab_counter(preprocessed_neg, cut_threshold, True)
     print("build vocab test data")
-    vocab_test = build_vocab_counter(preprocessed_test, cut_threshold, False)
+    vocab_test = build_vocab_counter(preprocessed_test, cut_threshold, True)
 
 
     print("export data")
@@ -258,7 +259,7 @@ def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
 #semantics : words that should be mapped on the representative
 #representative : the root on which all words in semantic should be mapped
 #tweet : the tweet in which words should be mapped
-
+'''
 def sem_by_repr(semantics, representative, tweet):
     """Retrun a tweet that countain only the representative of a given semantic """
 
@@ -291,7 +292,7 @@ def sem_by_repr2(semantics, tweet):
 
         tweet = sem_by_repr(sem , representative, tweet)
     return tweet
-
+'''
 #----------------------------no_dot(tweet)------------------------------------
 #replace dots (but not "...") by a space in a tweet
 #tweet : the tweet in which dots should be replaced
@@ -300,7 +301,9 @@ def sem_by_repr2(semantics, tweet):
 def no_dot(tweet):
     tweet = tweet.split()
     for i, t in enumerate(tweet):
-        if t == "...":
+        if t == len(t) * ".": #if contains only dots
+            if len(t) > 3:
+                tweet[i] = "..."
             continue
         if "." in t:
             if t[-1] == ".":
@@ -321,7 +324,7 @@ def find_repetition(tweet):
     copy = ""
     i = 0
     while i<len(tweet):
-        if (i<len(tweet)-3 and tweet[i] == tweet[i+1] and tweet[i] == tweet[i+2]):
+        if (i<len(tweet)-2 and tweet[i] == tweet[i+1] and tweet[i] == tweet[i+2] and tweet[i]!='.'):
             i = i+2
             while( i<len(tweet)-1 and tweet[i] == tweet[i+1] ):
                 i+=1
@@ -336,7 +339,7 @@ def find_repetition(tweet):
 #----------------------------stem_tweet(tweet)------------------------------------
 #stem all the words in a tweet using the nltk stemmer
 #tweet : the tweet in which words should be stemmed
-
+'''
 def stem_tweet(tweet):
     ps = PorterStemmer()
     tweet = tweet.split()
@@ -347,7 +350,7 @@ def stem_tweet(tweet):
 
     #reassemble the tweet words
     return " ".join(tweet)
-
+'''
 
 #----------------------------standardize_tweets(tweets)------------------------------------
 #remove repetitions and dots in the tweets
@@ -356,18 +359,29 @@ def stem_tweet(tweet):
 def standardize_tweets(tweets):
     "filter and uniform the tweets "
 
+    ps = PorterStemmer()
+    tknzr = TweetTokenizer(preserve_case=False)
+    loading_counter = 0
+    processed_tweets = []
     for i, tweet in enumerate(tweets):
         tweet = find_repetition(tweet)
         tweet = no_dot(tweet)
-        #tweets[i] = no_s(tweet)
+        tweet = " ".join([process_word(ps, word) for word in tknzr.tokenize(tweet)])
+        
+        processed_tweets.append(tweet)
+        
+        if loading_counter%1000==1:
+            print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
+        loading_counter+=1
+            
 
-    return tweets
+    return processed_tweets
 
 
 #----------------------------stem_tweets(tweets, semantic)------------------------------------
 #stem the tweets
 #tweets : the tweets that should be stemmed, a list of strings
-
+'''
 def stem_tweets(tweets, semantic):
     "filter and uniform the tweets "
 
@@ -376,7 +390,7 @@ def stem_tweets(tweets, semantic):
         tweets[i] = stem_tweet(tweet)
 
     return tweets
-
+'''
 #----------------------------extract_tokens(tknzr, tweet_string)------------------------------------
 #extract unigrams, bigrams and trigrams from a tweet
 #tweet_string : the tweet from which n-grams should be extracted
@@ -413,8 +427,8 @@ def build_vocab_counter(tweets, cut_threshold, bitri):
         if(bitri):
             final_counter.update(extract_tokens(tknzr, tweet))
         else :
-            final_counter.update(tweet.split(" "))
-        if loading_counter%1000==1:
+            final_counter.update(tknzr.tokenize(tweet))
+        if loading_counter%5000==1:
                 print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
         loading_counter+=1
 
@@ -512,3 +526,18 @@ def set_min_diff(data_tweets, merged):
             else:
                 print(str(d) + "not sucessful")
     return max(differences)
+
+
+#----------------------------process_word(ps, string)------------------------------------
+#pre-process a word using the nltk stemmer
+#ps : the PorterStemmer necessar to stem the word
+#string : the word to be pre-processed
+
+
+def process_word(ps, string):
+    string = ps.stem(string)
+    if len(string) > 8:
+        string = string[:8]
+    if (string.startswith("haha") or string.startswith("ahah")) and not(False in[c=="a" or c=="h" for c in string]):
+        string = "haha"
+    return string

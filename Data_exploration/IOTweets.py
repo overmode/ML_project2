@@ -1,7 +1,6 @@
 import pandas as pd
 from collections import Counter
 from datetime import datetime
-from ProcessTweets import *
 import csv
 
 #----------------------------build_df(filepath)------------------------------------
@@ -16,15 +15,12 @@ def build_df(filepath):
 
     #remove blank space words (pollution)
     df["len"] = df["word"].map(lambda x : len(x.split()))
-    df = df[df["len"]==2]
+    df = df[df["len"]>=2]
     df = df.drop(labels=["len"], axis = 1)
 
     #build the dataframe
     df["occurence"] = df["word"].map(lambda x:  x.split()[0])
-    df["word"] = df["word"].map(lambda x:  x.split()[1])
-    
-    #handling of n-grams
-    #df["word"] = df["word"].map(lambda x:  tuple(x.split()[1:]))
+    df["word"] = df["word"].map(lambda x:  tuple(x.split()[1:]))
     return df
 
 #----------------------------import_(path)------------------------------------
