@@ -198,8 +198,6 @@ def stemming(is_full, cut_threshold):
 
 
 def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
-    ########----------Build DF----------------------------------------
-    #### -------------- Partial tweets -------------------------------
 
     print("Import Data")
     #import tweets
@@ -255,13 +253,11 @@ def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
         write_vocab_to_file(vocab_test, "preprocessed_vocab_test")
 
 
-
-
-
-
-
-    word_max_ratio = list(mf_max_ratio.values)
-    return word_max_ratio
+#----------------------------sem_by_repr(semantics, representative, tweet)------------------------------------
+#replace all the words in semantic by the representative in a given tweets
+#semantics : words that should be mapped on the representative
+#representative : the root on which all words in semantic should be mapped
+#tweet : the tweet in which words should be mapped
 
 def sem_by_repr(semantics, representative, tweet):
     """Retrun a tweet that countain only the representative of a given semantic """
@@ -270,6 +266,12 @@ def sem_by_repr(semantics, representative, tweet):
         if (semantic in tweet):
             tweet = tweet.replace(semantic,representative)
     return tweet
+
+
+#----------------------------sem_by_repr2(semantics, tweet)------------------------------------
+#map words in a tweet using a list of semantics
+#semantics : a list of list of words where the first word in each inner list is the representative.
+#tweet : the tweet in which words should be mapped
 
 def sem_by_repr2(semantics, tweet):
     """Semanticss is a list of list of semantic where the first one is the representative.
@@ -280,15 +282,19 @@ def sem_by_repr2(semantics, tweet):
     ['friends', 'friendship', 'friendships', 'friendss', 'friendster']]
     """
 
+    # We sort by lenth on a non Ascending way to avoid the case where a string is a substring and would chang
     for semantic in semantics:
         representative = semantic[0]
         sem = semantic[1:]
-        sem = sorted(sem, key =len, reverse= True)  # We sort by lenth on a non Ascending way to avoid the case where a
-                                                    # String is a substring and would chang
+        sem = sorted(sem, key =len, reverse= True)
+
 
         tweet = sem_by_repr(sem , representative, tweet)
     return tweet
 
+#----------------------------no_dot(tweet)------------------------------------
+#replace dots (but not "...") by a blank space in a tweet
+#tweet : the tweet in which dots should be replaced
 
 
 def no_dot(tweet):
@@ -306,7 +312,9 @@ def no_dot(tweet):
 
 
 
-
+#----------------------------find_repetition(tweet)------------------------------------
+#replace occurences of n successive similar letters by a single one, where n >= 3
+#tweet : the tweet in which repetitions should be removed
 
 
 def find_repetition(tweet):
@@ -324,35 +332,27 @@ def find_repetition(tweet):
             i+=1
     return copy
 
-''' already done by nltk's stem
-def no_s(tweet):
-    tweet = tweet.split()
-    for i, t in enumerate(tweet):
 
-        if(len(t)>4 and t[-3:] == "ies"):
-            tweet[i] = t[0:-3] + "y"
-
-        if(len(t)>4 and t[-2:] == "es"):
-            tweet[i] = t[0:-2] + "e"
-
-        #if(len(t)>4 and t[-1]=="s"  and t[-2]!="s"):
-        #    tweet[i] = t[0:-1]
-
-    tweet = " ".join(tweet)
-    return tweet
-'''
-
-
+#----------------------------stem_tweet(tweet)------------------------------------
+#stem all the words in a tweet using the nltk stemmer
+#tweet : the tweet in which words should be stemmed
 
 def stem_tweet(tweet):
     ps = PorterStemmer()
     tweet = tweet.split()
+
+    #stem each word of the tweet
     for i, t in enumerate(tweet):
         tweet[i] = ps.stem(t)
 
+    #reassemble the tweet words
     return " ".join(tweet)
 
-#We could improve the processed tweets by first f
+
+#----------------------------standardize_tweets(tweets)------------------------------------
+#remove repetitions and dots in the tweets
+#tweets : the tweets in which repetitions and dots should be avoided, a list of strings
+
 def standardize_tweets(tweets):
     "filter and uniform the tweets "
 
@@ -363,19 +363,24 @@ def standardize_tweets(tweets):
 
     return tweets
 
-#We could improve the processed tweets by first f
+
+#----------------------------stem_tweets(tweets, semantic)------------------------------------
+#stem the tweets
+#tweets : the tweets that should be stemmed, a list of strings
+
 def stem_tweets(tweets, semantic):
     "filter and uniform the tweets "
 
     for i, tweet in enumerate(tweets):
-        tweet = sem_by_repr2(semantic, tweet)  #remplace haha
+        tweet = sem_by_repr2(semantic, tweet)
         tweets[i] = stem_tweet(tweet)
 
     return tweets
 
-
-def token_to_string(token):
-    return (str(token)).replace(" ", "")
+#----------------------------extract_tokens(tknzr, tweet_string)------------------------------------
+#extract unigrams, bigrams and trigrams from a tweet
+#tweet_string : the tweet from which n-grams should be extracted
+#tknzr : the tokenizer charged to extract the tokens, we use the one from nltk library
 
 def extract_tokens(tknzr, tweet_string):
 
@@ -387,6 +392,13 @@ def extract_tokens(tknzr, tweet_string):
         yield from trigrams(unigrams)
 
     return generator(unigrams)
+
+
+#----------------------------build_vocab_counter(tweets, cut_threshold, bitri)------------------------------------
+#retun a counter of n-grams occurences from a set of tweets
+#tweets : the set of tweets from which the counter counts
+#cut_threshold : the counter returned knows no wrds that have less than cut_threshold occurences in tweets
+#bitri : True iff the counter should count bigrams and trigrams of the words, counts only ords iff False
 
 def build_vocab_counter(tweets, cut_threshold, bitri):
     startTime= datetime.now()
@@ -420,32 +432,12 @@ def build_vocab_counter(tweets, cut_threshold, bitri):
     return final_counter
 
 
-def add_bitri(tweets):
-    "append bigrams and trigrams to the tweets "
-    nb_tweets = len(tweets)
-    for i, tweet in enumerate(tweets):
-        to_store = ''
-        for t in extract_tokens(tweet):
-            to_store = to_store + " " + token_to_string(t)
-        tweets[i] = to_store
-        if i%1000==0:
-            print("{:.1f}".format(i/nb_tweets*100), "%", end='\r')
-    return tweets
 
-def create_bitri_tweets(previous_name, dest, is_test_data):
-    startTime= datetime.now()
-    if is_test_data:
-        tweets = import_without_comma(previous_name, is_test_data)
-    else:
-        tweets = import_without_comma(previous_name, is_test_data)
-    tweets = add_bitri(tweets)
-    export(tweets, dest)
-    timeElapsed=datetime.now()-startTime
-    print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))
+#----------------------------contains(tweet, words)------------------------------------
+#return true iff the tweet contains at least one of the words
+#tweet is the thweet we want to know if it contains one of the words
+#words is a list of words thant we want to know if one is contained in the tweet
 
-#return true iff at least one of the tweets contains at least one of the words
-#tweets is an array of strings
-#words is a list of words
 def contains(tweet, words):
     for w1 in tweet.split():
         for w2 in words:
@@ -453,12 +445,19 @@ def contains(tweet, words):
                 return True
     return False
 
+#----------------------------drop_duplicates(tweets)------------------------------------
+#eliminate duplicated tweets
+#tweets is the list of tweets in which we want no duplicate
+
 def drop_duplicates(tweets):
     tweets = list(set(tweets))
     return tweets
 
 
-
+#----------------------------characteristic_words(data_tweets, merged)------------------------------------
+#writes in a file the words that can be considered as characteristics (see the report for further information)
+#data_tweets : the tweets that need to be labelled
+#merged : a dataframe containing pos words and neg words
 
 
 def characteristic_words(data_tweets, merged):
@@ -481,6 +480,12 @@ def characteristic_words(data_tweets, merged):
     char_neg_words.set_index("word")
     char_neg_words.to_csv(sep="\t", path_or_buf="characteristic_neg_words.txt", header=False, index=False)
 
+
+#----------------------------set_min_diff(data_tweets, merged)------------------------------------
+#determines what is the minimum number of occurrences for a word to be characteristic
+#data_tweets : the tweets that need to be labelled
+#merged : a dataframe containing pos words and neg words
+
 #Takes tweets to be labelled, and a merged instance of pos and neg vocabs
 def set_min_diff(data_tweets, merged):
     ratio_one = merged[(merged.ratio == 1)]
@@ -489,12 +494,18 @@ def set_min_diff(data_tweets, merged):
 
     for d in differences :
         found = True
+
+        #do not compute the same difference twice
         if d != previous :
             previous = d
+
+            #keep only words whose number of occurences is > d
             pos_words = ratio_one[ratio_one["occurence_pos"] > d]
             neg_words = ratio_one[ratio_one["occurence_neg"] > d]
 
             for t in data_tweets:
+
+                #d is not acceptable if two opposite characteristic words can be found in the same test tweet
                 if contains(t, pos_words) and contains(t, neg_words):
                     found= False
                     break;
