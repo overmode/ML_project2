@@ -33,6 +33,7 @@ def main():
                 if counter % 10000 == 0:
                     print(counter)
                 counter += 1
+    print("creating sparse matrix")
     cooc = coo_matrix((data, (row, col)))
     print("summing duplicates (this can take a while)")
     cooc.sum_duplicates()

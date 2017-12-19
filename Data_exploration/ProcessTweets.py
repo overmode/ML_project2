@@ -80,7 +80,7 @@ def create_relevant_vocab(pertinence_thres, min_count, dataframe):
     #construct the vocab and save it as a .txt file
     relevant = relevant[["word","ratio"]]
     relevant.set_index("word")
-    relevant.to_csv(sep="\t", path_or_buf=("relevant_vocab_pert="+str(pertinence_thres)+"_count="+str(min_count)), header=False, index=False)
+    relevant.to_csv(sep="\t", path_or_buf=("relevant_vocab_pert="+str(pertinence_thres)+"_count="+str(min_count)), header=True, index=False)
 
 
 #----------------------------stemming(is_full, cut_threshold)------------------------------------
