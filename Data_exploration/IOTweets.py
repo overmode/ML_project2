@@ -13,13 +13,11 @@ def build_df(filepath, bitri):
 
     tknzr = TweetTokenizer(preserve_case=False)
 
-    tknzr = TweetTokenizer(preserve_case=False)
-
     #load the vocabulary
     df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8",  header=None, names=["word"])
 
     #remove blank space words (pollution)
-    df["len"] = df["word"].map(lambda x : len(tknzr.tokenize(x)))
+    df["len"] = df["word"].map(lambda x : len(tokenize(tknzr, x)))
     if bitri:
         df = df[df["len"]>=2]
     else:
@@ -28,13 +26,22 @@ def build_df(filepath, bitri):
 
     #build the dataframe
     if bitri:
-        df["occurence"] = df["word"].map(lambda x:  tknzr.tokenize(x)[0])
-        df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
+        df["occurence"] = df["word"].map(lambda x:  tokenize(tknzr, x)[0])
+        df["word"] = df["word"].map(lambda x:  tuple(tokenize(tknzr, x)[1:]))
         return df
     else :
-        df["occurence"] = df["word"].map(lambda x:  tknzr.tokenize(x)[0])
-        df["word"] = df["word"].map(lambda x:  str(tknzr.tokenize(x)[1]))
+        df["occurence"] = df["word"].map(lambda x:  tokenize(tknzr, x)[0])
+        df["word"] = df["word"].map(lambda x:  str(tokenize(tknzr, x)[1]))
         return df
+    
+#----------------------------tokenize(tknzr, line)------------------------------------
+# transforms a line into a list of its tokens
+# tknzr : the tokenizer to be used to tokenize
+# line : the line to be tokenized
+def tokenize(tknzr, line):
+    tokens = tknzr.tokenize(line)
+    tokens = [tok for t in tokens for tok in t.split()] # split at spaces and flatten
+    return tokens
 
 #----------------------------import_(path)------------------------------------
 #import tweets written in file stocked under given path as an array of tweets (string)

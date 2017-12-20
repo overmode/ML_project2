@@ -366,7 +366,7 @@ def standardize_tweets(tweets):
     for i, tweet in enumerate(tweets):
         tweet = find_repetition(tweet)
         tweet = no_dot(tweet)
-        tweet = " ".join([process_word(ps, word) for word in tknzr.tokenize(tweet)])
+        tweet = " ".join([process_word(ps, word) for word in tokenize(tknzr, tweet)])
 
         processed_tweets.append(tweet)
 
@@ -398,7 +398,7 @@ def stem_tweets(tweets, semantic):
 
 def extract_tokens(tknzr, tweet_string):
 
-    unigrams = [token for token in tknzr.tokenize(tweet_string)]
+    unigrams = [token for token in tokenize(tknzr, tweet_string)]
 
     def generator(unigrams):
         yield from unigrams
@@ -427,7 +427,7 @@ def build_vocab_counter(tweets, cut_threshold, bitri):
         if(bitri):
             final_counter.update(extract_tokens(tknzr, tweet))
         else :
-            final_counter.update(tknzr.tokenize(tweet))
+            final_counter.update(tokenize(tknzr, tweet))
         if loading_counter%5000==1:
                 print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
         loading_counter+=1
