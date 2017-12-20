@@ -9,7 +9,11 @@ import csv
 # filepath : the path of the file in which the vocabulary is written
 
 
+<<<<<<< HEAD
 def build_df(filepath):
+=======
+def build_df(filepath, bitri):
+>>>>>>> origin/master
     
     tknzr = TweetTokenizer(preserve_case=False)
 
@@ -22,9 +26,24 @@ def build_df(filepath):
     df = df.drop(labels=["len"], axis = 1)
 
     #build the dataframe
+<<<<<<< HEAD
     df["occurence"] = df["word"].map(lambda x:  tknzr.tokenize(x)[0])
     df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
     return df
+=======
+    if bitri:
+        df["occurence"] = df["word"].map(lambda x:  int(tknzr.tokenize(x)[0]))
+        df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
+        return df
+    else :
+        df["occurence"] = df["word"].map(lambda x:  int(tknzr.tokenize(x)[0]))
+        df["word"] = df["word"].map(lambda x:  str(tknzr.tokenize(x)[1]))
+        return df
+
+#----------------------------import_(path)------------------------------------
+#import tweets written in file stocked under given path as an array of tweets (string)
+# path : the path of the file in which the tweets are written
+>>>>>>> origin/master
 
 #----------------------------import_(path)------------------------------------
 #import tweets written in file stocked under given path as an array of tweets (string)
