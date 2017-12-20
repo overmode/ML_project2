@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import Counter
 from datetime import datetime
+from nltk.tokenize import TweetTokenizer
 import csv
 
 #----------------------------build_df(filepath)------------------------------------
@@ -9,18 +10,20 @@ import csv
 
 
 def build_df(filepath):
+    
+    tknzr = TweetTokenizer(preserve_case=False)
 
     #load the vocabulary
     df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8",  header=None, names=["word"])
 
     #remove blank space words (pollution)
-    df["len"] = df["word"].map(lambda x : len(x.split()))
+    df["len"] = df["word"].map(lambda x : len(tknzr.tokenize(x)))
     df = df[df["len"]>=2]
     df = df.drop(labels=["len"], axis = 1)
 
     #build the dataframe
-    df["occurence"] = df["word"].map(lambda x:  x.split()[0])
-    df["word"] = df["word"].map(lambda x:  tuple(x.split()[1:]))
+    df["occurence"] = df["word"].map(lambda x:  tknzr.tokenize(x)[0])
+    df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
     return df
 
 #----------------------------import_(path)------------------------------------
