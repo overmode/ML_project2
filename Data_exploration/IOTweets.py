@@ -23,12 +23,12 @@ def build_df(filepath, bitri):
 
     #build the dataframe
     if bitri:
-        df["occurence"] = df["word"].map(lambda x:  int(x.split()[0]))
-        df["word"] = df["word"].map(lambda x:  tuple(x.split()[1:]))
+        df["occurence"] = df["word"].map(lambda x:  int(tknzr.tokenize(x)[0]))
+        df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
         return df
     else :
-        df["occurence"] = df["word"].map(lambda x:  int(x.split()[0]))
-        df["word"] = df["word"].map(lambda x:  str(x.split()[1]))
+        df["occurence"] = df["word"].map(lambda x:  int(tknzr.tokenize(x)[0]))
+        df["word"] = df["word"].map(lambda x:  str(tknzr.tokenize(x)[1]))
         return df
 
 #----------------------------import_(path)------------------------------------
