@@ -94,25 +94,25 @@ def stemming(is_full, cut_threshold):
 
     if(is_full):
         #import tweets
-        preprocessed_neg = import_("preprocessed_neg_full")
-        preprocessed_pos = import_("preprocessed_pos_full")
-        preprocessed_test = import_("preprocessed_test_full")
+        cleaned_neg = import_("cleaned_neg_full")
+        cleaned_pos = import_("cleaned_pos_full")
+        cleaned_test = import_("cleaned_test_full")
 
         #import vocabs
-        neg_df = build_df("preprocessed_vocab_neg_full")
-        pos_df = build_df("preprocessed_vocab_pos_full")
-        test_df = build_df("preprocessed_vocab_test_full")
+        neg_df = build_df("cleaned_vocab_neg_full")
+        pos_df = build_df("cleaned_vocab_pos_full")
+        test_df = build_df("cleaned_vocab_test_full")
 
     else :
         #import tweets
-        preprocessed_neg = import_("preprocessed_neg")
-        preprocessed_pos = import_("preprocessed_pos")
-        preprocessed_test = import_("preprocessed_test")
+        cleaned_neg = import_("cleaned_neg")
+        cleaned_pos = import_("cleaned_pos")
+        cleaned_test = import_("cleaned_test")
 
         #import vocabs
-        neg_df = build_df("preprocessed_vocab_neg")
-        pos_df = build_df("preprocessed_vocab_pos")
-        test_df = build_df("preprocessed_vocab_test")
+        neg_df = build_df("cleaned_vocab_neg")
+        pos_df = build_df("cleaned_vocab_pos")
+        test_df = build_df("cleaned_vocab_test")
 
 
 
@@ -146,11 +146,11 @@ def stemming(is_full, cut_threshold):
 
    #process tweets
     print("Process data pos")
-    stemmed_pos = stem_tweets( preprocessed_pos, semantic)
+    stemmed_pos = stem_tweets( cleaned_pos, semantic)
     print("Process data neg")
-    stemmed_neg = stem_tweets( preprocessed_neg, semantic) #Sous form d'un tableau de tweet
+    stemmed_neg = stem_tweets( cleaned_neg, semantic) #Sous form d'un tableau de tweet
     print("Process data test")
-    stemmed_test = stem_tweets( preprocessed_test, semantic) #Sous form d'un tableau de tweet
+    stemmed_test = stem_tweets( cleaned_test, semantic) #Sous form d'un tableau de tweet
 
 
 
@@ -189,7 +189,7 @@ def stemming(is_full, cut_threshold):
         write_vocab_to_file(vocab_test, "cleaned_vocab_test")
 '''
 
-#----------------------------process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold)------------------------------------
+#----------------------------clean_tweets(path_pos, path_neg, path_test, is_full, cut_threshold)------------------------------------
 #remove dots and repetitions in tweets, export the preprocessed tweets and their associated vocabs
 #path_pos : path towards the file containing pos tweets
 #path_neg : path towards the file containing neg tweets
@@ -198,7 +198,7 @@ def stemming(is_full, cut_threshold):
 #cut_threshold : min number of occurence that a word contained in the vocab should have
 
 
-def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
+def clean_tweets(path_pos, path_neg, path_test, is_full, cut_threshold):
 
     print("Import Data")
     #import tweets
@@ -212,19 +212,19 @@ def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
 
     #process tweets
     print("Process data pos")
-    preprocessed_pos = standardize_tweets( tweets_pos)
+    cleaned_pos = standardize_tweets( tweets_pos)
     print("Process data neg")
-    preprocessed_neg = standardize_tweets( tweets_neg) #Sous form d'un tableau de tweet
+    cleaned_neg = standardize_tweets( tweets_neg) #Sous form d'un tableau de tweet
     print("Process data test")
-    preprocessed_test = standardize_tweets( tweets_test) #Sous form d'un tableau de tweet
+    cleaned_test = standardize_tweets( tweets_test) #Sous form d'un tableau de tweet
 
     #build the counters
     print("build vocab data pos")
-    vocab_pos = build_vocab_counter(preprocessed_pos, cut_threshold, True)
+    vocab_pos = build_vocab_counter(cleaned_pos, cut_threshold, True)
     print("build vocab data neg")
-    vocab_neg = build_vocab_counter(preprocessed_neg, cut_threshold, True)
+    vocab_neg = build_vocab_counter(cleaned_neg, cut_threshold, True)
     print("build vocab test data")
-    vocab_test = build_vocab_counter(preprocessed_test, cut_threshold, True)
+    vocab_test = build_vocab_counter(cleaned_test, cut_threshold, True)
 
 
     print("export data")
@@ -232,26 +232,26 @@ def process_data_no_stem(path_pos, path_neg, path_test, is_full, cut_threshold):
     if(is_full):
 
         #export tweets
-        export(preprocessed_pos,  "preprocessed_pos_full")
-        export(preprocessed_neg,  "preprocessed_neg_full")
-        export(preprocessed_test, "preprocessed_test_full")
+        export(cleaned_pos,  "cleaned_pos_full_bitri=True")
+        export(cleaned_neg,  "cleaned_neg_full_bitri=True")
+        export(cleaned_test, "cleaned_test_bitri=True")
 
         #export vocabs
-        write_vocab_to_file(vocab_pos, "preprocessed_vocab_pos_full")
-        write_vocab_to_file(vocab_neg, "preprocessed_vocab_neg_full")
-        write_vocab_to_file(vocab_test, "preprocessed_vocab_test_full")
+        write_vocab_to_file(vocab_pos, "cleaned_vocab_pos_full_bitri=True")
+        write_vocab_to_file(vocab_neg, "cleaned_vocab_neg_full_bitri=True")
+        write_vocab_to_file(vocab_test, "cleaned_vocab_test_bitri=True")
 
 
     else :
         #export tweets
-        export(preprocessed_pos,  "preprocessed_pos")
-        export(preprocessed_neg,  "preprocessed_neg")
-        export(preprocessed_test, "preprocessed_test")
+        export(cleaned_pos,  "cleaned_pos_bitri=True")
+        export(cleaned_neg,  "cleaned_neg_bitri=True")
+        export(cleaned_test, "cleaned_test_bitri=True")
 
         #export vocabs
-        write_vocab_to_file(vocab_pos, "preprocessed_vocab_pos")
-        write_vocab_to_file(vocab_neg, "preprocessed_vocab_neg")
-        write_vocab_to_file(vocab_test, "preprocessed_vocab_test")
+        write_vocab_to_file(vocab_pos, "cleaned_vocab_pos_bitri=True")
+        write_vocab_to_file(vocab_neg, "cleaned_vocab_neg_bitri=True")
+        write_vocab_to_file(vocab_test, "cleaned_vocab_test_bitri=True")
 
 
 #----------------------------sem_by_repr(semantics, representative, tweet)------------------------------------
@@ -471,7 +471,7 @@ def drop_duplicates(tweets):
 #merged : a dataframe containing pos words and neg words
 
 
-def characteristic_words(data_tweets, merged):
+def characteristic_words(data_tweets, merged, is_full):
     #determine min number of occurence to define a word as characteristic
     min_diff = set_min_diff(data_tweets, merged)
 
@@ -481,7 +481,10 @@ def characteristic_words(data_tweets, merged):
 
     #save characteistic words to .txt file
     char_pos_words.set_index("word")
-    char_pos_words.to_csv(sep="\t", path_or_buf="characteristc_pos_words.txt", header=False, index=False)
+    if is_full:
+        char_pos_words.to_csv(sep="\t", path_or_buf="characteristc_pos_full_words.txt", header=False, index=False)
+    else:
+        char_pos_words.to_csv(sep="\t", path_or_buf="characteristc_pos_words.txt", header=False, index=False)
 
     #create negative characteristic words
     char_neg_words = merged[(merged.ratio == 1) & (merged.occurence_neg >= min_diff)]
@@ -489,7 +492,10 @@ def characteristic_words(data_tweets, merged):
 
     #save characteistic words to .txt file
     char_neg_words.set_index("word")
-    char_neg_words.to_csv(sep="\t", path_or_buf="characteristic_neg_words.txt", header=False, index=False)
+    if is_full:
+        char_neg_words.to_csv(sep="\t", path_or_buf="characteristic_neg_full_words.txt", header=False, index=False)
+    else:
+        char_neg_words.to_csv(sep="\t", path_or_buf="characteristic_neg_words.txt", header=False, index=False)
 
 
 #----------------------------set_min_diff(data_tweets, merged)------------------------------------
@@ -530,7 +536,7 @@ def set_min_diff(data_tweets, merged):
 
 #----------------------------process_word(ps, string)------------------------------------
 #pre-process a word using the nltk stemmer
-#ps : the PorterStemmer necessar to stem the word
+#ps : the PorterStemmer necessary to stem the word
 #string : the word to be pre-processed
 
 

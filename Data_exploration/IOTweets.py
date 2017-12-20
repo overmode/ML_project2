@@ -87,3 +87,12 @@ def write_vocab_to_file(vocab_counter, dest_file_name):
             else:
                 inputfile.write(str(token))
             inputfile.write("\n")
+
+
+#----------------------------write_vocab_to_file(vocab_counter, dest_file_name)------------------------------------
+#vocab_counter : the couter that counted the words
+#dest_file_name : the name of the file in which vocab should be written
+
+def write_vocab(tweets, cut_threshold, file_name , bitri):
+    counter = build_vocab_counter(tweets, cut_threshold, bitri)
+    write_vocab_to_file(counter, (file_name + "_cut=" +str(cut_threshold) +"_bitri="+str(bitri)))
