@@ -9,7 +9,7 @@ import csv
 # filepath : the path of the file in which the vocabulary is written
 
 
-def build_df(filepath):
+def build_df(filepath, bitri):
     
     tknzr = TweetTokenizer(preserve_case=False)
 
@@ -22,9 +22,14 @@ def build_df(filepath):
     df = df.drop(labels=["len"], axis = 1)
 
     #build the dataframe
-    df["occurence"] = df["word"].map(lambda x:  tknzr.tokenize(x)[0])
-    df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
-    return df
+    if bitri:
+        df["occurence"] = df["word"].map(lambda x:  int(x.split()[0]))
+        df["word"] = df["word"].map(lambda x:  tuple(x.split()[1:]))
+        return df
+    else :
+        df["occurence"] = df["word"].map(lambda x:  int(x.split()[0]))
+        df["word"] = df["word"].map(lambda x:  str(x.split()[1]))
+        return df
 
 #----------------------------import_(path)------------------------------------
 #import tweets written in file stocked under given path as an array of tweets (string)
