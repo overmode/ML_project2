@@ -367,13 +367,13 @@ def standardize_tweets(tweets):
         tweet = find_repetition(tweet)
         tweet = no_dot(tweet)
         tweet = " ".join([process_word(ps, word) for word in tknzr.tokenize(tweet)])
-        
+
         processed_tweets.append(tweet)
-        
+
         if loading_counter%1000==1:
             print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
         loading_counter+=1
-            
+
 
     return processed_tweets
 
@@ -435,7 +435,7 @@ def build_vocab_counter(tweets, cut_threshold, bitri):
     # remove less frequent items
     print("removing items present less than", cut_threshold, "times")
     final_counter = Counter(token for token in final_counter.elements() if final_counter[token] >= cut_threshold)
-    
+
     timeElapsed=datetime.now()-startTime
 
     print('Time elpased (hh:mm:ss.ms) {}'.format(timeElapsed))
