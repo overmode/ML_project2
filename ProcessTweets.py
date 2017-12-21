@@ -80,114 +80,10 @@ def create_relevant_vocab(pertinence_thres, min_count, dataframe):
     #construct the vocab and save it as a .txt file
     relevant = relevant[["ratio","word"]]
     relevant.set_index("word")
-    relevant.to_csv(sep="\t", path_or_buf=("relevant_vocab_pert="+str(pertinence_thres)+"_count="+str(min_count)), header=True, index=False)
+    write_relevance_to_file(relevant, "relevant_vocab_pert="+str(pertinence_thres)+"_count="+str(min_count))
+    
 
 
-#----------------------------stemming(is_full, cut_threshold)------------------------------------
-#stem the words in tweets and save the updated tweets in a fallen
-#is_full : True iff we load the full version of tweets
-#cut_threshold : the minimum number of total occurences that words in the vocab of stemmed tweets should have
-'''
-def stemming(is_full, cut_threshold):
-
-    print("Import Data")
-
-    if(is_full):
-        #import tweets
-        cleaned_neg = import_("cleaned_neg_full")
-        cleaned_pos = import_("cleaned_pos_full")
-        cleaned_test = import_("cleaned_test_full")
-
-        #import vocabs
-        neg_df = build_df("cleaned_vocab_neg_full")
-        pos_df = build_df("cleaned_vocab_pos_full")
-        test_df = build_df("cleaned_vocab_test_full")
-
-    else :
-        #import tweets
-        cleaned_neg = import_("cleaned_neg")
-        cleaned_pos = import_("cleaned_pos")
-        cleaned_test = import_("cleaned_test")
-
-        #import vocabs
-        neg_df = build_df("cleaned_vocab_neg")
-        pos_df = build_df("cleaned_vocab_pos")
-        test_df = build_df("cleaned_vocab_test")
-
-
-
-    #Merge Pos and neg dataframes
-    merged = merging(neg_df, pos_df, True)
-    merged = merging(merged, test_df, True)
-
-
-    print("Building semantic")
-
-    #Build equivalence list
-    same_begin = list(merged[merged["len"]==8]["word"])
-    same_begin = [list(merged.loc[(merged.word.str.startswith(w))]["word"]) for w in same_begin]
-
-    print("Building haha semantic")
-
-    #build "haha" equivalences
-    word_haha_list = list(merged.loc[merged.word.str.startswith("haha") | merged.word.str.startswith("ahah")]["word"])
-
-    word_haha_list.remove("haha")
-    word_haha_list.insert(0, "haha")
-    same_begin.append(list(word_haha_list))
-
-
-
-    print("filter semantic")
-
-    #fiter roots alone
-    semantic = filter_single_rep(same_begin)
-
-
-   #process tweets
-    print("Process data pos")
-    stemmed_pos = stem_tweets( cleaned_pos, semantic)
-    print("Process data neg")
-    stemmed_neg = stem_tweets( cleaned_neg, semantic) #Sous form d'un tableau de tweet
-    print("Process data test")
-    stemmed_test = stem_tweets( cleaned_test, semantic) #Sous form d'un tableau de tweet
-
-
-
-    print("export data")
-
-    #export data
-    if(is_full):
-        #export tweets
-        export(stemmed_neg,  "cleaned_neg_full")
-        export(stemmed_pos,  "cleaned_pos_full")
-        export(stemmed_test, "cleaned_test_full")
-
-        #export vocabs
-
-        vocab_neg_full = build_vocab_counter(stemmed_neg, cut_threshold,  True)
-        vocab_pos_full = build_vocab_counter(stemmed_pos, cut_threshold,  True)
-        vocab_test_full = build_vocab_counter(stemmed_test, cut_threshold,  True)
-
-        write_vocab_to_file(vocab_pos_full, "cleaned_vocab_pos_full")
-        write_vocab_to_file(vocab_neg_full, "cleaned_vocab_neg_full")
-        write_vocab_to_file(vocab_test_full, "cleaned_vocab_test_full")
-
-    else :
-        #export tweets
-        export(stemmed_neg,  "cleaned_neg")
-        export(stemmed_pos,  "cleaned_pos")
-        export(stemmed_test, "cleaned_test")
-
-        #export vocabs
-        vocab_neg = build_vocab_counter(stemmed_neg, cut_threshold,  True)
-        vocab_pos = build_vocab_counter(stemmed_pos, cut_threshold,  True)
-        vocab_test = build_vocab_counter(stemmed_test, cut_threshold,  True)
-
-        write_vocab_to_file(vocab_pos, "cleaned_vocab_pos")
-        write_vocab_to_file(vocab_neg, "cleaned_vocab_neg")
-        write_vocab_to_file(vocab_test, "cleaned_vocab_test")
-'''
 
 #----------------------------clean_tweets(path_pos, path_neg, path_test, is_full, cut_threshold)------------------------------------
 #remove dots and repetitions in tweets, export the preprocessed tweets and their associated vocabs
@@ -254,45 +150,7 @@ def clean_tweets(path_pos, path_neg, path_test, is_full, cut_threshold):
         write_vocab_to_file(vocab_test, "cleaned_vocab_test_bitri=True")
 
 
-#----------------------------sem_by_repr(semantics, representative, tweet)------------------------------------
-#replace all the words in semantic by the representative in a given tweets
-#semantics : words that should be mapped on the representative
-#representative : the root on which all words in semantic should be mapped
-#tweet : the tweet in which words should be mapped
-'''
-def sem_by_repr(semantics, representative, tweet):
-    """Retrun a tweet that countain only the representative of a given semantic """
 
-    for semantic in semantics:
-        if (semantic in tweet):
-            tweet = tweet.replace(semantic,representative)
-    return tweet
-
-
-#----------------------------sem_by_repr2(semantics, tweet)------------------------------------
-#map words in a tweet using a list of semantics
-#semantics : a list of list of words where the first word in each inner list is the representative.
-#tweet : the tweet in which words should be mapped
-
-def sem_by_repr2(semantics, tweet):
-    """Semanticss is a list of list of semantic where the first one is the representative.
-    Retrun a tweet that countain only the representative of a given semantic below is an exemple of the semantics
-
-    [['because', 'becausee'],
-    ['someone', "someone's", 'someones', 'someonee'],
-    ['friends', 'friendship', 'friendships', 'friendss', 'friendster']]
-    """
-
-    # We sort by lenth on a non Ascending way to avoid the case where a string is a substring and would chang
-    for semantic in semantics:
-        representative = semantic[0]
-        sem = semantic[1:]
-        sem = sorted(sem, key =len, reverse= True)
-
-
-        tweet = sem_by_repr(sem , representative, tweet)
-    return tweet
-'''
 #----------------------------no_dot(tweet)------------------------------------
 #replace dots (but not "...") by a space in a tweet
 #tweet : the tweet in which dots should be replaced
@@ -378,19 +236,7 @@ def standardize_tweets(tweets):
     return processed_tweets
 
 
-#----------------------------stem_tweets(tweets, semantic)------------------------------------
-#stem the tweets
-#tweets : the tweets that should be stemmed, a list of strings
-'''
-def stem_tweets(tweets, semantic):
-    "filter and uniform the tweets "
 
-    for i, tweet in enumerate(tweets):
-        tweet = sem_by_repr2(semantic, tweet)
-        tweets[i] = stem_tweet(tweet)
-
-    return tweets
-'''
 #----------------------------extract_tokens(tknzr, tweet_string)------------------------------------
 #extract unigrams, bigrams and trigrams from a tweet
 #tweet_string : the tweet from which n-grams should be extracted
@@ -548,7 +394,11 @@ def process_word(ps, string):
         string = "haha"
     return string
 
-
+#----------------------------build_global_vocab(is_full, bitri, cut)------------------------------------
+#creates a vocab of words and their occurences, words being contained in either pos, neg ort test cleaned tweets
+#is_full : True iff pos, neg and test that should be considered are the full versions
+#bitri : True iff we also want to add n-grams to the vocab
+#cut : the minimal number of occurences that a word contained in the final vocab should have
 
 def build_global_vocab(is_full, bitri, cut):
 
