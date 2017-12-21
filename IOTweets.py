@@ -33,7 +33,7 @@ def build_df(filepath, bitri):
         df["occurence"] = df["word"].map(lambda x:  tokenize(tknzr, x)[0])
         df["word"] = df["word"].map(lambda x:  str(tokenize(tknzr, x)[1]))
         return df
-    
+
 #----------------------------tokenize(tknzr, line)------------------------------------
 # transforms a line into a list of its tokens
 # tknzr : the tokenizer to be used to tokenize

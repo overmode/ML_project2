@@ -5,7 +5,7 @@ import pickle
 from nltk import bigrams, trigrams
 
 
-def to_cook(path_vocab = 'vocab_full.pkl', path_tweets_pos = "clean_pos_bitri=True", path_tweets_neg = "clean_neg_bitri=True",path_tweets_test ="clean_test_bitri=True" dest = 'cooc_full.pkl'):
+def to_cooc(path_vocab = 'global_vocab.pkl', path_tweets_pos = "clean_pos_bitri=True", path_tweets_neg = "clean_neg_bitri=True",path_tweets_test ="clean_test_bitri=True", dest = 'cooc_full.pkl'):
     """This method takes optionally the path of the pickled vocab
     and the path of the tweets. It then build with them to co-ocurrence matrix
     write the result in the file dest
