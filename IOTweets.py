@@ -126,7 +126,7 @@ def write_index_to_file(vocab, dest_file_name):
 #----------------------------extract_relevance(relevant_filename)------------------------------------
 #returns the relevance etracted from a file
 #relevant_filename : the name of the file that contains the relevance
-def extract_relevance(relevant_filename):
+def extract_relevant(relevant_filename):
     with open(relevant_filename, 'r', encoding="utf-8") as f:
         relevance = {}
         for line in f:
@@ -141,6 +141,6 @@ def extract_index(relevant_filename):
         relevance = {}
         for index, line in enumerate(f):
             split = line.split()
-            token = tuple(index, split[1:][1])
-            relevance[token] = split[0]
+            token = tuple(split[1:])
+            relevance[token] = index
         return relevance

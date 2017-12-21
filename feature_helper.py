@@ -1,60 +1,48 @@
 import numpy as np
 import pickle
 from ProcessTweets import *
+from nltk.tokenize import TweetTokenizer
 
 
-def construct_features(tweets, embeddings, weights):
+def construct_features(vocab_filename, tweets_filename, embeddings_filename, relevant_filename, nb_concat):
+    
+    vocab = extract_index(vocab_filename)
+    tweets = import_(tweets_filename)
+    embeddings = np.load(embeddings_filename)
+    relevant = extract_relevant(relevant_filename)
     features = []
-    invalid_features = [];
+    tknzr = TweetTokenizer(False)
     nb_dim = 50
-    pertinence = 35
-
-    with open('vocab_full.pkl', 'rb') as f :
-        vocab = pickle.load(f)
-
-    #Load words from tweet set
-    xs = np.load(embeddings)
-
-    for indl, line in enumerate(tweets):
-        #we differentiate tweets containing pertinent words, those in dictionnary 'weights'
-        sum_w_pertinent = np.zeros(nb_dim)
-        sum_w_others = np.zeros(nb_dim)
-
-        count_pertinent = 0
-        count_other = 0
-
-        for token in extract_tokens(line):
-            local_w = vocab.get(token, -1)
-            if local_w != -1:
-                weight = weights.get(token, -1)
-                if weight != -1:
-
-                    #If the word is pertinent, we add its word representation to others pertinents word's representation
-                    count_pertinent += weight*pertinence
-                    sum_w_pertinent += xs[local_w] * (weight*pertinence)
-
-                else:
-
-                    #If the word is not pertinent, we add its representation to non-pertinent words representations
-                    count_other += 1
-                    sum_w_others += xs[local_w]
-
-            # If we found pertinent words, we only use them
-        if(count_pertinent != 0):
-            features.append(sum_w_pertinent/count_pertinent)
-
-            #if we found only non-pertinent words, we use them anyway
-        elif count_other!= 0:
-            features.append(sum_w_others/count_other)
-
-            #if we did not find words that have representation, we do not try to create features and signal their indices
-        else:
-            invalid_features.append(indl)
-
-    invalid_features = np.array(invalid_features)
-    features = np.array(features)
-
-    return features, invalid_features
+    if nb_concat == -1:
+        nb_concat = len(tweets)
+    
+    tweets_embeddings = []
+    
+    #get the embeddings of each token
+    loading_counter = 0
+    for tweet in tweets:
+        token_embeddings = []
+        for token in extract_tokens(tknzr, tweet):
+            if token in vocab:
+                index = vocab.get(token)
+                token_embeddings.append([embeddings[index], float(relevant.get(token, 0))])
+                
+        #sum the different embeddings
+        if len(token_embeddings)==0:
+            tweets_embeddings.append([0]*nb_dim)
+            continue
+        sorted_token_embeddings = sorted(token_embeddings, key=lambda x: x[1])
+        sum_token_embeddings = sorted_token_embeddings[0][0]
+        for token_embedding in sorted_token_embeddings[1:nb_concat]:
+            sum_token_embeddings = sum_token_embeddings + token_embedding[0]
+            
+        tweets_embeddings.append(sum_token_embeddings / nb_concat)
+        
+        if loading_counter%1000==1:
+            print("{:.1f}".format(loading_counter/len(tweets)*100), "%", end='\r')
+        loading_counter+=1
+            
+    return tweets_embeddings
 
 
 def policy_unpredictable():

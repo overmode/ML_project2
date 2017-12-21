@@ -401,7 +401,7 @@ def extract_tokens(tknzr, tweet_string):
     unigrams = [token for token in tokenize(tknzr, tweet_string)]
 
     def generator(unigrams):
-        yield from unigrams
+        yield from [tuple([u]) for u in unigrams]
         yield from bigrams(unigrams)
         yield from trigrams(unigrams)
 
