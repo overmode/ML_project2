@@ -2,9 +2,9 @@
 import pickle
 
 
-def main():
+def main( vocab_filename, dest_filename):
     vocab = dict()
-    with open('preprocessed_vocab_pos') as f:
+    with open(vocab_filename) as f:
         for idx, line in enumerate(f):
             token = line.strip().split()[1:]
             if len(token) == 1:
@@ -13,7 +13,7 @@ def main():
                 token = tuple(token)
             vocab[token] = idx
 
-    with open('vocab_full.pkl', 'wb') as f:
+    with open(dest_filename, 'wb') as f:
         pickle.dump(vocab, f, pickle.HIGHEST_PROTOCOL)
 
 

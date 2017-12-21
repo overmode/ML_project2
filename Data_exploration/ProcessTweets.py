@@ -78,7 +78,7 @@ def create_relevant_vocab(pertinence_thres, min_count, dataframe):
     relevant = relevant[(relevant["occurence_pos"] + relevant["occurence_neg"]) >= min_count]
 
     #construct the vocab and save it as a .txt file
-    relevant = relevant[["word","ratio"]]
+    relevant = relevant[["ratio","word"]]
     relevant.set_index("word")
     relevant.to_csv(sep="\t", path_or_buf=("relevant_vocab_pert="+str(pertinence_thres)+"_count="+str(min_count)), header=True, index=False)
 
@@ -547,3 +547,30 @@ def process_word(ps, string):
     if (string.startswith("haha") or string.startswith("ahah")) and not(False in[c=="a" or c=="h" for c in string]):
         string = "haha"
     return string
+
+
+
+def build_global_vocab(is_full, bitri, cut):
+
+
+    if is_full:
+        full_string = "full_"
+    else :
+        full_string = ""
+
+    #import tweets
+    pos = import_("cleaned_pos_"+str(full_string)+"bitri="+str(bitri))
+    neg = import_("cleaned_neg_"+str(full_string)+"bitri="+str(bitri))
+    test = import_("cleaned_test_bitri="+str(bitri))
+
+
+    #create counter for all words
+    pos_counter = build_vocab_counter(pos, cut, bitri)
+    neg_counter = build_vocab_counter(neg, cut, bitri)
+    test_counter = build_vocab_counter(test, cut, bitri)
+
+    #sum counts
+    global_counter = pos_counter + neg_counter + test_counter
+
+    #write vocab file
+    write_vocab_to_file(global_counter, "global_"+str(full_string)+"vocab_cut=" + str(cut))

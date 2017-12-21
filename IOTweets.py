@@ -9,41 +9,39 @@ import csv
 # filepath : the path of the file in which the vocabulary is written
 
 
-<<<<<<< HEAD
-def build_df(filepath):
-=======
 def build_df(filepath, bitri):
->>>>>>> origin/master
-    
+
     tknzr = TweetTokenizer(preserve_case=False)
 
     #load the vocabulary
     df = pd.read_table(filepath_or_buffer = filepath, encoding="utf-8",  header=None, names=["word"])
 
     #remove blank space words (pollution)
-    df["len"] = df["word"].map(lambda x : len(tknzr.tokenize(x)))
-    df = df[df["len"]>=2]
+    df["len"] = df["word"].map(lambda x : len(tokenize(tknzr, x)))
+    if bitri:
+        df = df[df["len"]>=2]
+    else:
+        df = df[df["len"]==2]
     df = df.drop(labels=["len"], axis = 1)
 
     #build the dataframe
-<<<<<<< HEAD
-    df["occurence"] = df["word"].map(lambda x:  tknzr.tokenize(x)[0])
-    df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
-    return df
-=======
     if bitri:
-        df["occurence"] = df["word"].map(lambda x:  int(tknzr.tokenize(x)[0]))
-        df["word"] = df["word"].map(lambda x:  tuple(tknzr.tokenize(x)[1:]))
+        df["occurence"] = df["word"].map(lambda x:  tokenize(tknzr, x)[0])
+        df["word"] = df["word"].map(lambda x:  tuple(tokenize(tknzr, x)[1:]))
         return df
     else :
-        df["occurence"] = df["word"].map(lambda x:  int(tknzr.tokenize(x)[0]))
-        df["word"] = df["word"].map(lambda x:  str(tknzr.tokenize(x)[1]))
+        df["occurence"] = df["word"].map(lambda x:  tokenize(tknzr, x)[0])
+        df["word"] = df["word"].map(lambda x:  str(tokenize(tknzr, x)[1]))
         return df
-
-#----------------------------import_(path)------------------------------------
-#import tweets written in file stocked under given path as an array of tweets (string)
-# path : the path of the file in which the tweets are written
->>>>>>> origin/master
+    
+#----------------------------tokenize(tknzr, line)------------------------------------
+# transforms a line into a list of its tokens
+# tknzr : the tokenizer to be used to tokenize
+# line : the line to be tokenized
+def tokenize(tknzr, line):
+    tokens = tknzr.tokenize(line)
+    tokens = [tok for t in tokens for tok in t.split()] # split at spaces and flatten
+    return tokens
 
 #----------------------------import_(path)------------------------------------
 #import tweets written in file stocked under given path as an array of tweets (string)
@@ -89,3 +87,12 @@ def write_vocab_to_file(vocab_counter, dest_file_name):
             else:
                 inputfile.write(str(token))
             inputfile.write("\n")
+
+
+#----------------------------write_vocab_to_file(vocab_counter, dest_file_name)------------------------------------
+#vocab_counter : the couter that counted the words
+#dest_file_name : the name of the file in which vocab should be written
+
+def write_vocab(tweets, cut_threshold, file_name , bitri):
+    counter = build_vocab_counter(tweets, cut_threshold, bitri)
+    write_vocab_to_file(counter, (file_name + "_cut=" +str(cut_threshold) +"_bitri="+str(bitri)))
