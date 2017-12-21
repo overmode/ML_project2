@@ -141,6 +141,6 @@ def extract_index(relevant_filename):
         relevance = {}
         for index, line in enumerate(f):
             split = line.split()
-            token = tuple(split[1:])
+            token = tuple(index, split[1:][1])
             relevance[token] = split[0]
         return relevance
