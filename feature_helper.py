@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-from extract_tokens import *
+from ProcessTweets import *
 
 
 def construct_features(tweets, embeddings, weights):
