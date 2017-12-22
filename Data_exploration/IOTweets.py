@@ -33,7 +33,7 @@ def build_df(filepath, bitri):
         df["occurence"] = df["word"].map(lambda x:  tokenize(tknzr, x)[0])
         df["word"] = df["word"].map(lambda x:  str(tokenize(tknzr, x)[1]))
         return df
-    
+
 #----------------------------tokenize(tknzr, line)------------------------------------
 # transforms a line into a list of its tokens
 # tknzr : the tokenizer to be used to tokenize
@@ -96,3 +96,51 @@ def write_vocab_to_file(vocab_counter, dest_file_name):
 def write_vocab(tweets, cut_threshold, file_name , bitri):
     counter = build_vocab_counter(tweets, cut_threshold, bitri)
     write_vocab_to_file(counter, (file_name + "_cut=" +str(cut_threshold) +"_bitri="+str(bitri)))
+
+#----------------------------write_relevance_to_file(relevant, dest_file_name)------------------------------------
+#relevant : the dataframe of relevance that will be writen
+#dest_file_name : the name of the file in which relevance should be written
+def write_relevance_to_file(relevant, dest_file_name):
+    with open(dest_file_name, "w", encoding="utf-8") as inputfile:
+        for index, row in relevant.iterrows():
+            inputfile.write(str(row["ratio"]))
+            inputfile.write("\t")
+            if type(row["word"]) is tuple:
+                inputfile.write(" ".join(row["word"]))
+            else:
+                inputfile.write(str(row["word"]))
+            inputfile.write("\n")
+
+
+def write_index_to_file(vocab, dest_file_name):
+    with open(dest_file_name, "w", encoding="utf-8") as inputfile:
+        for index, row in relevant.iterrows():
+            inputfile.write(str(row["index"]))
+            inputfile.write("\t")
+            if type(row["word"]) is tuple:
+                inputfile.write(" ".join(row["word"]))
+            else:
+                inputfile.write(str(row["word"]))
+            inputfile.write("\n")
+
+#----------------------------extract_relevance(relevant_filename)------------------------------------
+#returns the relevance etracted from a file
+#relevant_filename : the name of the file that contains the relevance
+def extract_relevant(relevant_filename):
+    with open(relevant_filename, 'r', encoding="utf-8") as f:
+        relevance = {}
+        for line in f:
+            split = line.split()
+            token = tuple(split[1:])
+            relevance[token] = split[0]
+        return relevance
+
+
+def extract_index(relevant_filename):
+    with open(relevant_filename, 'r', encoding="utf-8") as f:
+        relevance = {}
+        for index, line in enumerate(f):
+            split = line.split()
+            token = tuple(split[1:])
+            relevance[token] = index
+        return relevance

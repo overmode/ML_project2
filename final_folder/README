@@ -1,0 +1,23 @@
+Hello dear reader,
+you will find all the explanations about all the inner working of the project in the nice files: 
+- explanations 1 (containing data pre-processing and vocabulary building)
+- explanations 2(containing actual feature extraction and neural network use).
+
+Note that there exists some python helper files as well, commented:
+
+=== pre-process phase ===
+- ProcessTweets.py : contains helper function to help the data pre-processing
+- IOTweets.py : function writing and reading from files
+
+=== coocurence matrix phase ====
+- pickle_vocab.py : reads the vocabulary and put in a pickle format
+- cooc.py : creates a coocurence matrix
+
+=== machine learning phase ===
+- feature_helper : containing helper functions for the feature extraction phase
+- split_data.py : spliting the data randomly between a test set and a train set
+
+
+
+
+- run.py doing every step as one
